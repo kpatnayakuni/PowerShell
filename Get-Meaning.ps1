@@ -5,7 +5,7 @@ function Get-Meaning
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
         [String] $Word
     )    
-    $Uri            = http://www.dictionary.com/browse/$Word"
+    $Uri            = "http://www.dictionary.com/browse/$Word"
     $ElementTagName = 'div'
     $ClassName      = 'def-content'
 
