@@ -1,0 +1,28 @@
+Hi Sarmistha,
+
+My achievements are listed as below...
+
+1. I have added 170+ prebuilds for SQL, OLAP, WM Servers on Berlin New hosts. 
+
+2. Modified the prebuild generate scripts to accommodate SQL Server 2014/2016 versions and OLAP Servers with fixed Server Name on Berlin platform. 
+
+3. Identified some critical issues, notified to the engineering team and got them resolved. 
+
+4. Developed and maintaining the SharePoint sites to keep track the progress of the on-going Builds, Migtrations, Logical Flip & Decommissions. 
+
+5. Created different views from the SharePoint sites for reporting and management glance.
+
+6. Actively participated in Berlin code base testing, reviewed around 290+ scripts & functions and helped the team in understanding and reporting the issues appropriately to the engineering team. 
+
+7. Actively participated on testing of BCR & TempDB configuration scripts and identified many issues and got them resolved. 
+
+8. Inventory Job - Developed 3 PowerShell scripts to pull the information from SQL & OLAP Servers across the ISG,WM and Berlin platforms and maintain them on a central server which has an access to the DBAs across the firm. The database is fully integrated and consistent. The scripts pull the information from the servers at various levels like host level, instance level, meta data level & app level. The scripts are fully customised & adhere to the MS standards. These scripts got place in MS code base and appreciation from client.
+
+9. Developed few Linux (bash) wrappers like syncasl, showreq2 and few other, which will drastically reduce the manual intervention and saves considerable amount of time. 
+
+10. Completed ITIL Foundation training & certification. 
+
+11. Contribution to EI, took around 20+ candidates and got candidate selected. 
+
+Thank you,
+Kiran P. 
