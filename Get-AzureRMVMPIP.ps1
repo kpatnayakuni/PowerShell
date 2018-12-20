@@ -31,6 +31,7 @@ else { [Microsoft.Azure.Commands.Compute.Models.PSVirtualMachine] $VM = $VMObjec
 [Microsoft.Azure.Commands.Network.Models.PSNetworkInterface] $NIC = Get-AzureRmNetworkInterface | Where-Object {$_.id -eq $NICId}
 
 [string] $PIPId = $NIC.Properties.ipConfigurations.properties.publicIPAddress.id
+$PIPId
 
 <#
 
