@@ -9,12 +9,12 @@ param
     [Parameter(Mandatory=$true,ParameterSetName='Object')]
     [Microsoft.Azure.Commands.Compute.Models.PSVirtualMachine] $VMObject,
     [Parameter(Mandatory=$true,ParameterSetName='Help')]
-    [string] $H
+    [switch] $H
 )
 
 if ($PSCmdlet.ParameterSetName -eq 'Help' -and $H)
 {
-    Get-Help -Path $PSScriptRoot
+    Get-Help $PSCommandPath
     break
 }
 
