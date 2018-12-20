@@ -26,9 +26,7 @@ if ($PSCmdlet.ParameterSetName -eq 'Name')
 else { [Microsoft.Azure.Commands.Compute.Models.PSVirtualMachine] $VM = $VMObject }
 
 [string] $NICId = $VM.NetworkProfile.NetworkInterfaces.id
-
 [Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels.PSResource] $NICResource = Get-AzureRmResource -ResourceId $NICId
-
 [string] $PIPId = $NICResource.Properties.ipConfigurations.properties.publicIPAddress.id
 [Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels.PSResource] $PIPResource = Get-AzureRmResource -ResourceId $PIPId
 [ipaddress] $PIP = $PIPResource.Properties.ipAddress
