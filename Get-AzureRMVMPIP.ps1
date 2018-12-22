@@ -29,7 +29,7 @@ elseif ($PSCmdlet.ParameterSetName -eq 'Object') { [Microsoft.Azure.Commands.Com
 
 if ([string]::IsNullOrEmpty($VMStatus))
 {
-    Write-Verbose -Message "Cannot "
+    Write-Verbose -Message "Cannot find"
 }
 
 [string] $NICId = $VM.NetworkProfile.NetworkInterfaces.id
