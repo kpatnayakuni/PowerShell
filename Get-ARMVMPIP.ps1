@@ -51,6 +51,14 @@ Returns the public ip address when the VM is running or the VM is deallocated bu
 
 .EXAMPLE
 
+C:\GitRepo> $VM = Get-AzureRmVM -ResourceGroupName lab-rg -Name Workstation
+C:\GitRepo> $VM | .\Get-ARMVMPIP.ps1
+xxx.xxx.xxx.xxx
+
+Returns the public ip address when the VM is running or the VM is deallocated but the publicIPAllocationMethod is set to 'Static'.
+
+.EXAMPLE
+
 C:\GitRepo> .\Get-ARMVMPIP.ps1 -ResourceGroupName lab-rg -Name Workstation -StartIfVMIsNotRunning
 xxx.xxx.xxx.xxx
 
