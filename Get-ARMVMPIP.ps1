@@ -36,6 +36,7 @@ Specify the flag to disply this help
 Specify ResourceGroupName & VMName parameters when the script wants to be resolved through 'Name' parameterset.
 Specify the VMObject parameter when the script wants to be resolved through 'Object' parameterset.
 And other common paramaters for their respective purposes
+Default Parameter Set is 'Name'
 
 .OUTPUTS
 
@@ -125,14 +126,21 @@ if ($ModuleVersion -lt $RequiredModuleVersion)
 
 # Login in into the Azure account, if it is not already logged in
 if([string]::IsNullOrEmpty($(Get-AzureRmContext)))
-{ $null = Add-AzureRmAccount }
+{ 
+    $null = Add-AzureRmAccount 
+}
 
 # Retrieve the virtual machine running status
 try
 {
     if ($PSCmdlet.ParameterSetName -eq 'Name')
-    { [Microsoft.Azure.Commands.Compute.Models.PSVirtualMachineInstanceView] $VM = Get-AzureRmVM -ResourceGroupName $ResourceGroupName -Name $VMName -Status}
-    elseif ($PSCmdlet.ParameterSetName -eq 'Object') { [Microsoft.Azure.Commands.Compute.Models.PSVirtualMachineInstanceView] $VM = Get-AzureRmVM -ResourceGroupName $VMObject.ResourceGroupName -Name $VMObject.Name -Status }
+    { 
+        [Microsoft.Azure.Commands.Compute.Models.PSVirtualMachineInstanceView] $VM = Get-AzureRmVM -ResourceGroupName $ResourceGroupName -Name $VMName -Status
+    }
+    elseif ($PSCmdlet.ParameterSetName -eq 'Object') 
+    { 
+        [Microsoft.Azure.Commands.Compute.Models.PSVirtualMachineInstanceView] $VM = Get-AzureRmVM -ResourceGroupName $VMObject.ResourceGroupName -Name $VMObject.Name -Status 
+    }
 }
 catch
 {
@@ -142,7 +150,10 @@ catch
 
 # Check whether the vm PowerState is running
 [Microsoft.Azure.Management.Compute.Models.InstanceViewStatus] $VMStatus = $VM.Statuses | Where-Object { $_.Code -match 'running' }
-if ([string]::IsNullOrEmpty($VMStatus)) { [bool] $ISVMRunning = $false } else { [bool] $ISVMRunning = $true }
+if ([string]::IsNullOrEmpty($VMStatus)) 
+{ 
+    [bool] $ISVMRunning = $false } else { [bool] $ISVMRunning = $true 
+}
 
 # If VM is not running and -StartIfVMIsNotRunning flag is enabled, then start the VM 
 if ($ISVMRunning -eq $false -and $StartIfVMIsNotRunning -eq $true)
