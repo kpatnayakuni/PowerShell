@@ -24,16 +24,28 @@ $SQLServerObject | Add-Member -MemberType ScriptMethod -Name ConnectSQL -Value {
 
 $SQLServerObject | Add-Member -MemberType ScriptMethod -Name ExecuteSQL -Value {
 
-    if ([string]::IsNullOrEmpty($this.SQLQuery))
+    param
+    (
+        [Parameter(Mandatory=$false)]
+        [string] $QueryText
+    )
+
+    [string] $SQLQuery = $this.SQLQuery
+    if ([string]::IsNullOrEmpty($QueryText) -eq $false)
     {
-        Write-Host "Please add sql query to this object, by using .SQLQuery property." -ForegroundColor Red
+        $SQLQuery = $QueryText
+    }
+
+    if ([string]::IsNullOrEmpty($SQLQuery))
+    {
+        Write-Host "Please add query to this object or enter the query." -ForegroundColor Red
     }
     else
     {
         if ($this.SQLConnection.State -eq 'Open')
         {
             $SQLCommand = New-Object System.Data.SqlClient.SqlCommand
-            $SQLCommand.CommandText = $this.SQLQuery
+            $SQLCommand.CommandText = $SQLQuery
             $SQLCommand.CommandTimeout = $this.QueryTimeOut
             $SQLCommand.Connection = $this.SQLConnection
 
@@ -46,7 +58,7 @@ $SQLServerObject | Add-Member -MemberType ScriptMethod -Name ExecuteSQL -Value {
         }
         else
         {
-            Write-Host "No open connection found, run .ConnectSQL()" -ForegroundColor Red
+            Write-Host "No open connection found." -ForegroundColor Red
         }
     }
 }
