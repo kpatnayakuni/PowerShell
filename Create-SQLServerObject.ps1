@@ -51,4 +51,8 @@ $SQLServerObject | Add-Member -MemberType ScriptMethod -Name ExecuteSQL -Value {
     }
 }
 
+$SQLServerObject | Add-Member -MemberType ScriptMethod -Name TestConnection -Value {
+    Test-Connection -ComputerName $this.ServerName -ErrorAction SilentlyContinue
+} 
+
 return, $SQLServerObject
