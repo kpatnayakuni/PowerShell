@@ -55,14 +55,15 @@ $SQLServerObject | Add-Member -MemberType ScriptMethod -Name ExecuteSQL -Value {
     {
         if ($this.SQLConnection.State -eq 'Open')
         {
+            # SQL Command
             $SQLCommand = New-Object System.Data.SqlClient.SqlCommand
             $SQLCommand.CommandText = $SQLQuery
             $SQLCommand.CommandTimeout = $this.QueryTimeOut
             $SQLCommand.Connection = $this.SQLConnection
-
+            # SQL Adapter
             $SQLAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
             $SQLAdapter.SelectCommand = $SQLCommand
-
+            # Dataset
             $DataSet = New-Object System.Data.Dataset
             $SQLAdapter.Fill($DataSet) | Out-Null
             return $DataSet.Tables[0]
