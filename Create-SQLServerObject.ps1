@@ -1,13 +1,21 @@
+# Create an object
 $SQLServerObject = New-Object -TypeName psobject
 
-$SQLServerObject | Add-Member -MemberType NoteProperty -Name ServerName -Value 'SQLServer'
-$SQLServerObject | Add-Member -MemberType NoteProperty -Name DefaultPort -Value 1433
-$SQLServerObject | Add-Member -MemberType NoteProperty -Name Database -Value 'master'
-$SQLServerObject | Add-Member -MemberType NoteProperty -Name ConnectionTimeOut -Value 15
-$SQLServerObject | Add-Member -MemberType NoteProperty -Name QueryTimeOut -Value 15
-$SQLServerObject | Add-Member -MemberType NoteProperty -Name SQLQuery -Value ''
-$SQLServerObject | Add-Member -MemberType NoteProperty -Name SQLConnection -Value ''
+# Basic properties
+$SQLServerObject | Add-Member -MemberType NoteProperty -Name ServerName -Value 'SQLServer'  # Server Name
+$SQLServerObject | Add-Member -MemberType NoteProperty -Name DefaultPort -Value 1433        # Port
+$SQLServerObject | Add-Member -MemberType NoteProperty -Name Database -Value 'master'       # Database
+$SQLServerObject | Add-Member -MemberType NoteProperty -Name ConnectionTimeOut -Value 15    # Connection Timeout
+$SQLServerObject | Add-Member -MemberType NoteProperty -Name QueryTimeOut -Value 15         # Query Timeout
+$SQLServerObject | Add-Member -MemberType NoteProperty -Name SQLQuery -Value ''             # SQL Query
+$SQLServerObject | Add-Member -MemberType NoteProperty -Name SQLConnection -Value ''        # SQL Connection
 
+# Method to ensure the server is pingable
+$SQLServerObject | Add-Member -MemberType ScriptMethod -Name TestConnection -Value {
+    Test-Connection -ComputerName $this.ServerName -ErrorAction SilentlyContinue
+}
+
+# Method to establish the connection to SQL Server and holds the connection object for further use
 $SQLServerObject | Add-Member -MemberType ScriptMethod -Name ConnectSQL -Value {
     
     [string] $ServerName= $this.ServerName
@@ -22,6 +30,7 @@ $SQLServerObject | Add-Member -MemberType ScriptMethod -Name ConnectSQL -Value {
     $this.SQLConnection = $SQLConnection
 }
 
+# Execute SQL method to execute queries using the connection established with ConnectSQL
 $SQLServerObject | Add-Member -MemberType ScriptMethod -Name ExecuteSQL -Value {
 
     param
@@ -30,12 +39,14 @@ $SQLServerObject | Add-Member -MemberType ScriptMethod -Name ExecuteSQL -Value {
         [string] $QueryText
     )
 
+    # Select runtime query / predefined query
     [string] $SQLQuery = $this.SQLQuery
     if ([string]::IsNullOrEmpty($QueryText) -eq $false)
     {
         $SQLQuery = $QueryText
     }
 
+    # Verify the query is not null and empty, then execute
     if ([string]::IsNullOrEmpty($SQLQuery))
     {
         Write-Host "Please add query to this object or enter the query." -ForegroundColor Red
@@ -61,10 +72,7 @@ $SQLServerObject | Add-Member -MemberType ScriptMethod -Name ExecuteSQL -Value {
             Write-Host "No open connection found." -ForegroundColor Red
         }
     }
-}
-
-$SQLServerObject | Add-Member -MemberType ScriptMethod -Name TestConnection -Value {
-    Test-Connection -ComputerName $this.ServerName -ErrorAction SilentlyContinue
 } 
 
+# Return the object
 return, $SQLServerObject
