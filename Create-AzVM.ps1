@@ -29,7 +29,11 @@ param
 
 # Verify Login
 Write-Verbose -Message ("{0} - {1}" -f (Get-Date).ToString(),"Verifying the Azure login subscription status...")
-if( -not $(Get-AzContext) ) {  return }
+if( -not $(Get-AzContext) ) 
+{  
+	Write-Verbose -Message ("{0} - {1}" -f (Get-Date).ToString(),"Login to Azure subscription failed, no valid subscription found.")
+	return 
+}
 Write-Verbose -Message ("{0} - {1}" -f (Get-Date).ToString(),"Login to Azure subscription successfully!")
 
 # Verify VM doesn't exist
