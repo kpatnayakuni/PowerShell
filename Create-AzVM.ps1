@@ -42,7 +42,7 @@ Write-Verbose -Message ("{0} - {1}" -f (Get-Date).ToString(),"Checking the $VMNa
 if($null -ne $VM)
 {
 	Write-Error "$VMName VM is already existed in $ResourceGroupName ResourceGroup, exiting..."
-	break
+	return
 }
 Write-Verbose -Message ("{0} - {1}" -f (Get-Date).ToString(),"No VM found with the name $VMName.")
 
