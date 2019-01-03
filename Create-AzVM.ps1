@@ -57,7 +57,7 @@ if (-not $PSBoundParameters.ContainsKey('VMCredential'))
 if ($VMCredential.GetType().Name -ne "PSCredential")
 {
     Write-Error "No valid credential found, exiting..."
-    break
+    return
 }
 Write-Verbose -Message ("{0} - {1}" -f (Get-Date).ToString(),"Obtained valid VM login credentials")
 
