@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace MyPC
+namespace MyComputer
 {
-    public static class RB
+    public static class RecycleBin
     {
         enum RecycleFlags : int
         {
