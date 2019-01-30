@@ -5,6 +5,8 @@ $ISOFile = 'C:\Workspace\ISO\en_windows_server_2019_x64_dvd_4cb967d8.iso'
 $WimImagePath = 'C:\Workspace\WimImage'
 $ExtractPath = 'C:\Workspace\Extracted'
 $PackagesPath = 'C:\Workspace\Packages'
+$ImageName = 'Windows Server 2019 Datacenter'
+$DriversPath = 'C:\Workspace\Drivers'
 
 
 
@@ -27,7 +29,7 @@ ImageIndex ImageName                                             ImageSize
 
 # Let's keep Windows Server 2019 Datacenter Core edition and remove other editions from the image
 $null = Get-WindowsImage -ImagePath $WimImage | `
-Where-Object -FilterScript {$_.ImageName -ne 'Windows Server 2019 Datacenter'} | `
+Where-Object -FilterScript {$_.ImageName -ne $ImageName} | `
 ForEach-Object {Remove-WindowsImage -ImagePath $WimImage -Name $_.ImageName}
 
 # Verify the required edition is exist in the image
@@ -38,9 +40,24 @@ ImageIndex ImageName                                             ImageSize
          1 Windows Server 2019 Datacenter                       7983593326
 #>
 
+# 
+
 $null = Mount-WindowsImage -ImagePath $WimImage -Index 1 -Path $ExtractPath
 
-Get-WindowsPackage -Path $ExtractPath
+# Get-WindowsPackage -Path $ExtractPath
+# Remove-WindowsPackage -Path $ExtractPath -PackageName "<packagename>"
 
 Add-WindowsPackage -Path $ExtractPath -PackagePath $PackagesPath
+
+# Get-WindowsDriver -Path $ExtractPath
+# Export-WindowsDriver -Online -Destination "<driverpath>"
+# Remove-WindowsDriver -Path $ExtractPath "<drivername>"
+
+Add-WindowsDriver -Path $ExtractPath -Driver $DriversPath -Recurse `
+-ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+
+# Get-WindowsOptionalFeature -Path $ExtractPath
+# Disable-WindowsOptionalFeature -Path $ExtractPath -FeatureName "<featurename>"
+
+$null = Enable-WindowsOptionalFeature -Path $ExtractPath -FeatureName IIS-WebServerRole
 
