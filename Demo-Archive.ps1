@@ -13,7 +13,7 @@ Compress-Archive -Path C:\Reference\* -Update -DestinationPath C:\Archives\Draft
 # Example 4: Create an archive from an entire folder
 Compress-Archive -Path C:\Reference -DestinationPath C:\Archives\Draft
 
-## Unzip the file 
+## Unzip the file
 
 # Example 1: Extract the contents of an archive
 Expand-Archive -LiteralPath C:\Archives\Draft.Zip -DestinationPath C:\Reference
