@@ -9,9 +9,15 @@ Function Get-WinSrvFromInv
 }
 Function Check-WindowsActivation 
 {
+    Param
+    (
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true)]
+        [string] $ComputerName
+    )
+
     Process
     {
-        $SPL = Get-CimInstance -ClassName SoftwareLicensingProduct 
+        $SPL = Get-CimInstance -ClassName SoftwareLicensingProduct -ComputerName $ComputerName
         $WinProduct = $SPL | Where-Object -FilterScript { $null -eq $_.PartialProductKey -and $_.Name -like "Windows*" }
         $Status = if ($WinProduct.LicenseStatus -eq 1) { "Activated" } else { "Not Activated" }
         New-Object -TypeName psobject -Property @{
