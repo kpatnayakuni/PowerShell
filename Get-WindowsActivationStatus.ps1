@@ -7,8 +7,9 @@ Function Get-WinSrvFromInv
     #>
     return @("Srv2K19", "Srv2K16", "Srv2K12")
 }
-Function Check-WindowsActivation 
+Function Get-WindowsActivation 
 {
+    [CmdLetBinding()]
     Param
     (
         [Parameter(Mandatory=$true,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true)]
@@ -22,7 +23,7 @@ Function Check-WindowsActivation
     {
         foreach ($CN in $ComputerName)
         {
-            $SPL = Get-CimInstance -ClassName SoftwareLicensingProduct -ComputerName $CN
+            $SPL = Get-CimInstance -ClassName SoftwareLicensingProduct -ComputerName $CN -Filter 
             $WinProduct = $SPL | Where-Object -FilterScript { $null -eq $_.PartialProductKey -and $_.Name -like "Windows*" }
             $Status = if ($WinProduct.LicenseStatus -eq 1) { "Activated" } else { "Not Activated" }
             $ActivationStatus += New-Object -TypeName psobject -Property @{
@@ -37,4 +38,4 @@ Function Check-WindowsActivation
     }
 }
 
-Get-WinSrvFromInv | Check-WindowsActivation
+Get-WinSrvFromInv | Get-WindowsActivation
