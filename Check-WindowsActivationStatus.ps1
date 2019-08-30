@@ -16,7 +16,7 @@ Function Check-WindowsActivation
     )
     Begin
     {
-        $Status = @()
+        $ActivationStatus = @()
     }
     Process
     {
@@ -25,7 +25,7 @@ Function Check-WindowsActivation
             $SPL = Get-CimInstance -ClassName SoftwareLicensingProduct -ComputerName $CN
             $WinProduct = $SPL | Where-Object -FilterScript { $null -eq $_.PartialProductKey -and $_.Name -like "Windows*" }
             $Status = if ($WinProduct.LicenseStatus -eq 1) { "Activated" } else { "Not Activated" }
-            $Status += New-Object -TypeName psobject -Property @{
+            $ActivationStatus += New-Object -TypeName psobject -Property @{
                 ComputerName = $ComputerName
                 Status = $Status
             }
@@ -33,7 +33,7 @@ Function Check-WindowsActivation
     }
     End
     {
-        return $Status
+        return $ActivationStatus
     }
 }
 
