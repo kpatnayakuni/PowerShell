@@ -23,8 +23,8 @@ Function Get-WindowsActivation
     {
         foreach ($CN in $ComputerName)
         {
-            $SPL = Get-CimInstance -ClassName SoftwareLicensingProduct -ComputerName $CN -Filter 
-            $WinProduct = $SPL | Where-Object -FilterScript { $null -eq $_.PartialProductKey -and $_.Name -like "Windows*" }
+            $SPL = Get-CimInstance -ClassName SoftwareLicensingProduct -ComputerName $CN -Filter "PartialProductKey IS NOT NULL"
+            $WinProduct = $SPL | Where-Object Name -like "Windows*" 
             $Status = if ($WinProduct.LicenseStatus -eq 1) { "Activated" } else { "Not Activated" }
             $ActivationStatus += New-Object -TypeName psobject -Property @{
                 ComputerName = $CN
