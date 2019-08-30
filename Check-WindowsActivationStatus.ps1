@@ -12,18 +12,28 @@ Function Check-WindowsActivation
     Param
     (
         [Parameter(Mandatory=$true,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true)]
-        [string] $ComputerName
+        [string[]] $ComputerName
     )
-
+    Begin
+    {
+        $Status = @()
+    }
     Process
     {
-        $SPL = Get-CimInstance -ClassName SoftwareLicensingProduct -ComputerName $ComputerName
-        $WinProduct = $SPL | Where-Object -FilterScript { $null -eq $_.PartialProductKey -and $_.Name -like "Windows*" }
-        $Status = if ($WinProduct.LicenseStatus -eq 1) { "Activated" } else { "Not Activated" }
-        New-Object -TypeName psobject -Property @{
-            ComputerName = $WinProduct.PSComputerName
-            Status = $Status
+        foreach ($CN in $ComputerName)
+        {
+            $SPL = Get-CimInstance -ClassName SoftwareLicensingProduct -ComputerName $CN
+            $WinProduct = $SPL | Where-Object -FilterScript { $null -eq $_.PartialProductKey -and $_.Name -like "Windows*" }
+            $Status = if ($WinProduct.LicenseStatus -eq 1) { "Activated" } else { "Not Activated" }
+            $Status += New-Object -TypeName psobject -Property @{
+                ComputerName = $ComputerName
+                Status = $Status
+            }
         }
+    }
+    End
+    {
+        return $Status
     }
 }
 
