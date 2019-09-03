@@ -37,5 +37,5 @@ if ($null -eq $IsPackageInstalled)
 
 Set-PSRepository -Name $RepositoryName -InstallationPolicy Untrusted
 
-Get-Service -$PackageName
+Get-Service -Name $PackageName
 Invoke-Expression "docker version"

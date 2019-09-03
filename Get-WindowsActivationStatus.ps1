@@ -25,6 +25,7 @@ Function Get-WindowsActivation
         foreach ($CN in $ComputerName)
         {
             try { 
+                    Test-Connection -TargetName $CN -ErrorAction Stop
                     $SPL = Get-CimInstance -ClassName SoftwareLicensingProduct -ComputerName $CN -Filter "PartialProductKey IS NOT NULL"
                     $WinProduct = $SPL | Where-Object Name -like "Windows*" 
                     $Status = if ($WinProduct.LicenseStatus -eq 1) { "Activated" } else { "Not Activated" }
