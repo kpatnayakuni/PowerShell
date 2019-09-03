@@ -18,34 +18,30 @@ Function Get-WindowsActivation
     Begin
     {
         $ActivationStatus = @()
-        $ErroredServers = @()
     }
     Process
     {
         foreach ($CN in $ComputerName)
         {
-            try { 
-                    $PingStatus = Test-Connection -ComputerName $CN -ErrorAction Stop -Count 1 -Quiet
-                    $SPL = Get-CimInstance -ClassName SoftwareLicensingProduct -ComputerName $CN -Filter "PartialProductKey IS NOT NULL"
-                    $WinProduct = $SPL | Where-Object Name -like "Windows*" 
-                    $Status = if ($WinProduct.LicenseStatus -eq 1) { "Activated" } else { "Not Activated" }
-                    $ActivationStatus += New-Object -TypeName psobject -Property @{
-                        ComputerName = $CN
-                        Status = $Status
-                        IsPinging = $PingStatus
-                    }
-                }
-            catch {
-                    $ErroredServers += New-Object -TypeName psobject -Property @{
-                        ComputerName = $CN
-                        Error = $_.Exception.Message
-                    } 
-                }
+            $PingStatus = Test-Connection -ComputerName $CN -ErrorAction Stop -Count 1 -Quiet
+            $SPL = Get-CimInstance -ClassName SoftwareLicensingProduct -ComputerName $CN -Filter "PartialProductKey IS NOT NULL" -ErrorAction Stop
+            $WinProduct = $SPL | Where-Object Name -like "Windows*" 
+            $Status = if ($WinProduct.LicenseStatus -eq 1) { "Activated" } else { "Not Activated" }
+            if ($PingStatus -ne $true)
+            {
+                $PingStatus = $false
+                $Status = "Error"
+            }
+            $ActivationStatus += New-Object -TypeName psobject -Property @{
+                ComputerName = $CN
+                Status = $Status
+                IsPinging = $PingStatus
+            }
         }
     }
     End
     {
-        return $ActivationStatus, $ErroredServers
+        return $ActivationStatus | Select-Object -Property ComputerName, IsPinging, Status
     }
 }
 
