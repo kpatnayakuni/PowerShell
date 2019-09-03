@@ -25,13 +25,14 @@ Function Get-WindowsActivation
         foreach ($CN in $ComputerName)
         {
             try { 
-                    Test-Connection -ComputerName $CN -ErrorAction Stop -Count 1 -Quiet
+                    $PingStatus = Test-Connection -ComputerName $CN -ErrorAction Stop -Count 1 -Quiet
                     $SPL = Get-CimInstance -ClassName SoftwareLicensingProduct -ComputerName $CN -Filter "PartialProductKey IS NOT NULL"
                     $WinProduct = $SPL | Where-Object Name -like "Windows*" 
                     $Status = if ($WinProduct.LicenseStatus -eq 1) { "Activated" } else { "Not Activated" }
                     $ActivationStatus += New-Object -TypeName psobject -Property @{
                         ComputerName = $CN
                         Status = $Status
+                        IsPinging = $PingStatus
                     }
                 }
             catch {
