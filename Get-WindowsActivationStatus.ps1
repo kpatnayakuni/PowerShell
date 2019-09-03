@@ -35,9 +35,9 @@ Function Get-WindowsActivation
             $Status = if ($WinProduct.LicenseStatus -eq 1) { "Activated" } else { "Not Activated" }
             if ($PingStatus -ne $true)
             {
-                $PingStatus = $false
+                $PingStatus = "No"
                 $Status = "Error"
-            }
+            } else { $PingStatus = "Yes" }
             $ActivationStatus += New-Object -TypeName psobject -Property @{
                 ComputerName = $CN
                 Status = $Status
