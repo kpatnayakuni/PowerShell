@@ -41,7 +41,7 @@ Function Get-WindowsActivation
     }
     End
     {
-        return $ActivationStatus | Select-Object -Property ComputerName, IsPinging, Status
+        return $($ActivationStatus | Select-Object -Property ComputerName, IsPinging, Status)
     }
 }
 
