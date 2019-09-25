@@ -83,3 +83,5 @@ Function Get-AzVMCreateDate
 # vmobj=$(az vm show --resource-group LINUX-RG --name ubuntu01 -d --query "storageProfile.osDisk.name" -o tsv)
 # az disk show --resource-group LINUX-RG --name $vmobj --query "timeCreated" -o tsv
 # date -d $createdate '+%Y/%m/%d %T'
+
+# gist id: https://gist.github.com/164e11f4a61be2222e14f4f146fdf93c
