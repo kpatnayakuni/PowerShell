@@ -75,3 +75,10 @@ Function Get-AzVMCreateDate
 <# Calling the function
     PS > Get-AzVMCreateDate
 #>
+
+#### 
+## Azure Cli
+####
+
+# vmobj=$(az vm show --resource-group LINUX-RG --name ubuntu01 -d --query "storageProfile.osDisk.name" -o tsv)
+# az disk show --resource-group LINUX-RG --name $vmobj --query "timeCreated" -o tsv
