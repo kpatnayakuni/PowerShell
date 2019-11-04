@@ -2,10 +2,11 @@
 Get-CimInstance -ClassName Win32_OperatingSystem | Select-Object -Property PSComputerName, `
 @{Name = 'Memory in GB'; Expression = {[Math]::Round($_.TotalVisibleMemorySize/1MB)}}
 
-# Output
+<# Output
 PSComputerName Memory in GB
 -------------- ------------
 Workstation               8
+#>
 
 # Get the services where the names are starting with App, and display IsRunning with Yes/No using the calculated property
 $IsRunning = @{
@@ -17,7 +18,7 @@ $IsRunning = @{
 }
 Get-Service -Name App* | Select-Object -Property Name, DisplayName, $IsRunning
 
-#Output
+<#Output
 Name         DisplayName                       IsRunning
 ----         -----------                       ---------
 AppIDSvc     Application Identity              No
@@ -26,3 +27,4 @@ AppMgmt      Application Management            No
 AppReadiness App Readiness                     No
 AppVClient   Microsoft App-V Client            No
 AppXSvc      AppX Deployment Service (AppXSVC) No
+#>
