@@ -1,3 +1,6 @@
+# Exit the execution as a script 
+return 
+
 # List all the available RBAC roles
 Get-AzRoleDefinition 
 
@@ -34,4 +37,22 @@ Get-AzADUser -StartsWith "<search string>"
 Get-AzADUser -DisplayName "<User DisplayName>"
 Get-AzADUser -UserPrincipalName "<User Principal Name>"
 
-Get-AzADGroup -SearchString Az
+Get-AzADGroup -SearchString "<group search string>"
+Get-AzADServicePrincipal -SearchString "<service principal>"
+
+# Create a role assignment for a user at a resource group scope
+New-AzRoleAssignment -SignInName "<email_or_userprincipalname>" -RoleDefinitionName "<role_name>" -ResourceGroupName "<resource_group_name>"
+
+# Create a role assignment for a group at a resource scope
+New-AzRoleAssignment -ObjectId "<object_id>" -RoleDefinitionName "<role_name>" -ResourceName "<resource_name>" -ResourceType "<resource_type>" -ResourceGroupName "<resource_group_name>"
+# -ObjectId is group id, and get the id using Get-AzADGroup CmdLet.
+
+# Create a role assignment for an application at a subscription scope
+New-AzRoleAssignment -ObjectId "<application_id>" -RoleDefinitionName "<role_name>" -Scope "/subscriptions/<subscription_id>"
+
+# Remove the role assignment from the user on resource group scope
+Remove-AzRoleAssignment -SignInName user@domain.com -RoleDefinitionName "Virtual Machine Contributor" -ResourceGroupName lab-rg
+
+# Remove the role from a group at a subscription scope.
+Remove-AzRoleAssignment -ObjectId "<object_id>" -RoleDefinitionName "<role_name>" -Scope "/subscriptions/<subscription_id>"
+# -ObjectId is group id, and get the id using Get-AzADGroup CmdLet.
