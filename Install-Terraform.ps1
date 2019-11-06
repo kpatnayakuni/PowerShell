@@ -18,4 +18,4 @@ $PathString = (Get-ItemProperty -Path $RegPathKey -Name PATH).Path
 $PathString += ";$DownloadPath"
 Set-ItemProperty -Path $RegPathKey -Name PATH –Value $PathString
 
-Invoke-Expression -Command "terraform -help"
+powerShell -Command "& {terraform -help}"
