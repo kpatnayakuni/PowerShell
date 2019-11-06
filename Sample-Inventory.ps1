@@ -1,4 +1,4 @@
-Function Get-WindowsActivation 
+Function Get-Inventory
 {
     [CmdLetBinding()]
     Param
