@@ -7,7 +7,7 @@ $CPUs   = Get-CimInstance -ClassName CIM_Processor -ComputerName $Computername
 $CPUInfo= @()
 foreach ($CPU in $CPUs) 
 {
-    $CPUInfo += [hashtable]@{
+    $CPUInfo += New-Object -TypeName psobject -Property @{
         DeviceID    = $CPU.DeviceID
         Name        = $CPU.Caption 
     }
@@ -18,7 +18,7 @@ $DiskInfo   = @()
 foreach ($Disk in $Disks)
 {
     if ($Disk.Access -ne 0) { continue }
-    $DiskInfo += [hashtable]@{
+    $DiskInfo += New-Object -TypeName psobject -Property @{
         Drive       = $Disk.Name
         Size        = [math]::Round($Disk.Size/1GB)
         FreeSpace   = [math]::Round($Disk.FreeSpace/1GB)
@@ -36,4 +36,4 @@ $Output = New-Object -TypeName psobject -Property @{
     ServiceTag              = $BIOS.SerialNumber
 }
 
-return, $Output
+return $Output
