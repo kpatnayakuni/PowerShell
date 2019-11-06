@@ -42,7 +42,7 @@ Function Get-Inventory
             }
             $User = Invoke-Command -ScriptBlock { "$($ENV:USERDOMAIN)\$($ENV:USERNAME)" } -ComputerName $CN
 
-            $Output = New-Object -TypeName psobject -Property @{
+            $Output += New-Object -TypeName psobject -Property @{
                 ComputerName            = $CN
                 CurrentlyLoggedOnUser   = $User
                 OperatingSystem         = $OS.Caption
