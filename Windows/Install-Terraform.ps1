@@ -1,6 +1,7 @@
 $Url = 'https://www.terraform.io/downloads.html'
 $DownloadPath = 'C:\Terraform\'
 $RegPathKey = 'HKLM:\System\CurrentControlSet\Control\Session Manager\Environment'
+#$RegPathKey = 'HKCU:\Environment\'
 
 if ((Test-Path -Path $DownloadPath) -eq $false) { New-Item -Path $DownloadPath -ItemType Directory -Force }
 
@@ -11,11 +12,12 @@ $FileName = Split-Path -Path $DownloadLink -Leaf
 $DownloadFile = [string]::Concat( $DownloadPath, $FileName )
 Invoke-RestMethod -Method Get -Uri $DownloadLink -OutFile $DownloadFile
 
-Expand-Archive -Path $DownloadFile -DestinationPath $DownloadPath
+Expand-Archive -Path $DownloadFile -DestinationPath $DownloadPath -Force
 Remove-Item -Path $DownloadFile -Force
 
 $PathString = (Get-ItemProperty -Path $RegPathKey -Name PATH).Path
-$PathString += ";$DownloadPath"
-Set-ItemProperty -Path $RegPathKey -Name PATH –Value $PathString
+$PathString = $PathString + ";" + $DownloadPath
+Set-ItemProperty -Path $RegPathKey -Name PATH -Value $PathString
 
-powerShell -Command "& {terraform -help}"
+#Start-Process -FilePath powershell -ArgumentList "terraform help"
+Write-Host "Please restart the terminal/console to start with Terraform"
