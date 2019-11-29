@@ -18,7 +18,7 @@ $IsRunning = @{
 }
 Get-Service -Name App* | Select-Object -Property Name, DisplayName, $IsRunning
 
-<#Output
+<# Output
 Name         DisplayName                       IsRunning
 ----         -----------                       ---------
 AppIDSvc     Application Identity              No
