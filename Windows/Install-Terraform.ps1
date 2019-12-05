@@ -1,23 +1,44 @@
-$Url = 'https://www.terraform.io/downloads.html'
-$DownloadPath = 'C:\Terraform\'
-$RegPathKey = 'HKLM:\System\CurrentControlSet\Control\Session Manager\Environment'
-#$RegPathKey = 'HKCU:\Environment\'
+Function Install-Terraform
+{
+    # Ensure to run the function with administrator privilege 
+    if (-not (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
+    { Write-Host -ForegroundColor Red -Object "!!! Please run as Administrator !!!"; return }
+    
+    # Terrafrom download Url
+    $Url = 'https://www.terraform.io/downloads.html'
 
-if ((Test-Path -Path $DownloadPath) -eq $false) { New-Item -Path $DownloadPath -ItemType Directory -Force }
+    # Local path to download the terraform zip file
+    $DownloadPath = 'C:\Terraform\'
 
-$Web = Invoke-WebRequest -Uri $Url
-$FileInfo = $Web.Links | Where-Object href -match windows_amd64
-$DownloadLink = $FileInfo.href
-$FileName = Split-Path -Path $DownloadLink -Leaf
-$DownloadFile = [string]::Concat( $DownloadPath, $FileName )
-Invoke-RestMethod -Method Get -Uri $DownloadLink -OutFile $DownloadFile
+    # Reg Key to set the persistent PATH 
+    $RegPathKey = 'HKLM:\System\CurrentControlSet\Control\Session Manager\Environment'
 
-Expand-Archive -Path $DownloadFile -DestinationPath $DownloadPath -Force
-Remove-Item -Path $DownloadFile -Force
+    # Create the local folder if it doesn't exist
+    if ((Test-Path -Path $DownloadPath) -eq $false) { $null = New-Item -Path $DownloadPath -ItemType Directory -Force }
 
-$PathString = (Get-ItemProperty -Path $RegPathKey -Name PATH).Path
-$PathString = $PathString + ";" + $DownloadPath
-Set-ItemProperty -Path $RegPathKey -Name PATH -Value $PathString
+    # Download the Terraform exe in zip format
+    $Web = Invoke-WebRequest -Uri $Url
+    $FileInfo = $Web.Links | Where-Object href -match windows_amd64
+    $DownloadLink = $FileInfo.href
+    $FileName = Split-Path -Path $DownloadLink -Leaf
+    $DownloadFile = [string]::Concat( $DownloadPath, $FileName )
+    Invoke-RestMethod -Method Get -Uri $DownloadLink -OutFile $DownloadFile
 
-#Start-Process -FilePath powershell -ArgumentList "terraform help"
-Write-Host "Please restart the terminal/console to start with Terraform"
+    # Extract & delete the zip file
+    Expand-Archive -Path $DownloadFile -DestinationPath $DownloadPath -Force
+    Remove-Item -Path $DownloadFile -Force
+
+    # Setting the persistent path in the registry if it is not set already
+    if ($DownloadPath -notin $($ENV:Path -split ';'))
+    {
+        $PathString = (Get-ItemProperty -Path $RegPathKey -Name PATH).Path
+        $PathString += ";$DownloadPath"
+        Set-ItemProperty -Path $RegPathKey -Name PATH -Value $PathString
+
+        # Setting the path for the current session
+        $ENV:Path += ";$DownloadPath"
+    }
+
+    # Verify the download
+    Invoke-Expression -Command "terraform version"
+}
