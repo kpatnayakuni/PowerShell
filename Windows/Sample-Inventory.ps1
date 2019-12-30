@@ -59,3 +59,5 @@ Function Get-Inventory
         return $Output
     }
 }
+
+Get-Inventory -ComputerName 'localhost' | Out-File -FilePath C:\Windows\Temp\Log.txt

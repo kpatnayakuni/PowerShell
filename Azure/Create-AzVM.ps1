@@ -223,7 +223,7 @@ $VMConfig | Set-AzVMSourceImage -PublisherName $VMSourceImage.PublisherName -Off
 Write-Verbose -Message ("{0} - {1}" -f (Get-Date).ToString(),"Configuring $OSType VM...")
 $VMConfig | Add-AzVMNetworkInterface -Id $NIC.Id | Out-Null
 Write-Verbose -Message ("{0} - {1}" -f (Get-Date).ToString(),"Configuring NIC...")
-$VMConfig | Set-AzVMBootDiagnostics -Disable | Out-Null
+$VMConfig | Set-AzVMBootDiagnostic -Disable | Out-Null
 Write-Verbose -Message ("{0} - {1}" -f (Get-Date).ToString(),"Configuring boot diagnostics...")
 
 # Create a virtual machine
