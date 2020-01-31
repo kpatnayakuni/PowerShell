@@ -7,35 +7,43 @@
 # Enable User Assigned Managed Indentity to VM
 # Test access on the VM in which UAMI enabled
 
-Select-AzSubscription -SubscriptionName 'Kiran Lab Subscription'
+return
+$rgName = 'Test-RG'
+$location = 'westus'
+$null = New-AzResourceGroup -Name $rgName -Location $location
 
-$RGName = 'Test-RG'
-$Location = 'westus'
-$null = New-AzResourceGroup -Name $RGName -Location $Location
+$vmName = 'Test-VM'
+$userName = 'sysadmin'
+$plainTextPassword = 'P@ssw0rd!'
+$securePassword = $plainTextPassword | ConvertTo-SecureString -AsPlainText -Force
+$credential = [pscredential]::new($userName, $securePassword)
+$vm = New-AzVM -ResourceGroupName $rgName -Name $vmName -Location $location -Credential $credential
 
-$VMName = 'Test-VM'
-$UserName = 'sysadmin'
-$PlainTextPassword = 'P@ssw0rd!'
-$SecurePassword = $PlainTextPassword | ConvertTo-SecureString -AsPlainText -Force
-$Credential = [pscredential]::new($UserName, $SecurePassword)
-$VM = New-AzVM -ResourceGroupName $RGName -Name $VMName -Location $Location -Credential $Credential
+$vmPIP = Get-AzPublicIpAddress -ResourceGroupName $rgName -Name $vmName | ForEach-Object IpAddress
 
-Import-Module -Name Az.ManagedServiceIdentity
+$moduleName = 'Az.ManagedServiceIdentity'
+Install-Module -Name $moduleName -Force
+Import-Module -Name $moduleName
 
-$IdentityName = 'amuai'
-$Identity = New-AzUserAssignedIdentity -Name $IdentityName -ResourceGroupName $RGName -Location $Location
+$identityName = 'amuai'
+$identity = New-AzUserAssignedIdentity -Name $identityName -ResourceGroupName $rgName -Location $location
 
-$KeyVaultName = 'testakv99'
-$KeyVault = New-AzKeyVault -ResourceGroupName $RGName -Name $KeyVaultName -Location $Location
+$keyVaultName = 'testakv99'
+$keyVault = New-AzKeyVault -ResourceGroupName $rgName -Name $keyVaultName -Location $location
 
-Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name BadPassword -SecretValue $SecurePassword
+$null = Set-AzKeyVaultSecret -VaultName $keyVaultName -Name $userName -SecretValue $securePassword
 
-New-AzRoleAssignment -ApplicationId $Identity.ClientId -RoleDefinitionName Reader -Scope $KeyVault.ResourceId
+$null = New-AzRoleAssignment -ApplicationId $identity.ClientId -RoleDefinitionName Reader -Scope $keyVault.ResourceId
 
-Set-AzKeyVaultAccessPolicy -ResourceGroupName $RGName -VaultName $KeyVaultName -ServicePrincipalName $Identity.ClientId -PermissionsToSecrets get
+Set-AzKeyVaultAccessPolicy -ResourceGroupName $rgName -VaultName $keyVaultName -ServicePrincipalName $identity.ClientId -PermissionsToSecrets get
 
-Update-AzVM -ResourceGroupName $RGName -VM $VM -IdentityType UserAssigned -IdentityID $Identity.Id
+$null = Update-AzVM -ResourceGroupName $rgName -VM $vm -IdentityType UserAssigned -IdentityID $identity.Id
 
 # On the VM in which UAMI enabled
+Enter-PSSession -ComputerName $vmPIP -Credential $credential
+Install-PackageProvider -Name NuGet -Force
+Install-Module -Name Az -Force
 Login-AzAccount -Identity
-Get-AzKeyVaultSecret -VaultName testakv99 -Name BadPassword | Select-Object -ExpandProperty SecretValueText
+$kvName = 'testakv99'
+$uName = 'sysadmin'
+Get-AzKeyVaultSecret -VaultName $kvName -Name $uName | ForEach-Object SecretValueText
