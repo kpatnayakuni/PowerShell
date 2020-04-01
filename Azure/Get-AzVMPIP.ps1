@@ -122,11 +122,11 @@ try
 {
     if ($PSCmdlet.ParameterSetName -eq 'Name')
     { 
-        [Microsoft.Azure.Commands.Compute.Models.PSVirtualMachineInstanceView] $VM = Get-AzVM -ResourceGroupName $ResourceGroupName -Name $VMName -Status
+        $VM = Get-AzVM -ResourceGroupName $ResourceGroupName -Name $VMName -Status
     }
     elseif ($PSCmdlet.ParameterSetName -eq 'Object') 
     { 
-        [Microsoft.Azure.Commands.Compute.Models.PSVirtualMachineInstanceView] $VM = Get-AzVM -ResourceGroupName $VMObject.ResourceGroupName -Name $VMObject.Name -Status 
+        $VM = Get-AzVM -ResourceGroupName $VMObject.ResourceGroupName -Name $VMObject.Name -Status 
     }
 }
 catch
@@ -136,10 +136,10 @@ catch
 }
 
 # Check whether the vm PowerState is running
-[Microsoft.Azure.Management.Compute.Models.InstanceViewStatus] $VMStatus = $VM.Statuses | Where-Object { $_.Code -match 'running' }
+$VMStatus = $VM.Statuses | Where-Object { $_.Code -match 'running' }
 if ([string]::IsNullOrEmpty($VMStatus)) 
 { 
-    [bool] $ISVMRunning = $false } else { [bool] $ISVMRunning = $true 
+    $ISVMRunning = $false } else { [bool] $ISVMRunning = $true 
 }
 
 # If VM is not running and -StartIfVMIsNotRunning flag is enabled, then start the VM 
@@ -150,15 +150,15 @@ if ($ISVMRunning -eq $false -and $StartIfVMIsNotRunning -eq $true)
 } 
 
 # Get Public IP address 
-[Microsoft.Azure.Commands.Compute.Models.PSVirtualMachine] $VirtualMachine = Get-AzVM -ResourceGroupName $VM.ResourceGroupName -Name $VM.Name
-[string] $NICId = $VirtualMachine.NetworkProfile.NetworkInterfaces.id
-[Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels.PSResource] $NICResource = Get-AzResource -ResourceId $NICId
-[string] $PIPId = $NICResource.Properties.ipConfigurations.properties.publicIPAddress.id
-[Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels.PSResource] $PIPResource = Get-AzResource -ResourceId $PIPId
-[ipaddress] $PIP = $PIPResource.Properties.ipAddress
+$VirtualMachine = Get-AzVM -ResourceGroupName $VM.ResourceGroupName -Name $VM.Name
+$NICId = $VirtualMachine.NetworkProfile.NetworkInterfaces.id
+$NICResource = Get-AzResource -ResourceId $NICId
+$PIPId = $NICResource.Properties.ipConfigurations.properties.publicIPAddress.id
+$PIPResource = Get-AzResource -ResourceId $PIPId
+$PIP = $PIPResource.Properties.ipAddress
 
 # Exit the script if the VM is not running and PublicIPAllocationMethod is Dynamic or public ip is not assigned 
-[string] $PublicIPAllocationMethod = $PIPResource.Properties.publicIPAllocationMethod
+$PublicIPAllocationMethod = $PIPResource.Properties.publicIPAllocationMethod
 if ([string]::IsNullOrEmpty($PIP.IPAddressToString) -and $ISVMRunning -eq $false -and $PublicIPAllocationMethod -eq 'Dynamic')
 {
     Write-Verbose -Message $("Since {0} VM is not running and 'Public IP Allocation Method is Dynamic', unable to determine the Public IP.`nRun the command with -StartIfVMIsNotRunning flag" -f $VMName)
