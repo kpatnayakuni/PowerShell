@@ -1,4 +1,4 @@
-Function Copy-AzNSGRules
+Function Copy-AzNSGSecurityRules
 {
     <#
     .SYNOPSIS
@@ -42,8 +42,8 @@ Function Copy-AzNSGRules
 
     .EXAMPLE
 
-     . .\Copy-AzNSGRules.ps1
-    PS C:\> Copy-AzNSGRules -SourceResourceGroupName 'rg1' -SourceNSGName 'nsg1' -TargetResourceGroupName 'rg2' -TargetNSGName 'nsg2'
+     . .\Copy-AzNSGSecurityRules.ps1
+    PS C:\> Copy-AzNSGSecurityRules -SourceResourceGroupName 'rg1' -SourceNSGName 'nsg1' -TargetResourceGroupName 'rg2' -TargetNSGName 'nsg2'
 
     To copy security rules from the existing source NSG to existing target NSG
 
@@ -53,8 +53,8 @@ Function Copy-AzNSGRules
 
     .EXAMPLE
 
-     . .\Copy-AzNSGRules.ps1
-    PS C:\> Copy-AzNSGRules -SourceResourceGroupName 'rg1' -SourceNSGName 'nsg1' -TargetNSGName 'nsg2' -TargetResourceGroupName 'rg2' -TargetLocation 'southindia'
+     . .\Copy-AzNSGSecurityRules.ps1
+    PS C:\> Copy-AzNSGSecurityRules -SourceResourceGroupName 'rg1' -SourceNSGName 'nsg1' -TargetNSGName 'nsg2' -TargetResourceGroupName 'rg2' -TargetLocation 'southindia'
 
     To create a new NSG and then copy security rules from the existing source NSG
 
@@ -71,10 +71,10 @@ Function Copy-AzNSGRules
 
     .EXAMPLE
 
-     . .\Copy-AzNSGRules.ps1
+     . .\Copy-AzNSGSecurityRules.ps1
     PS C:\> $nsg1 = Get-AzNetworkSecurityGroup -ResourceGroupName 'rg1' -Name 'nsg1'
     PS C:\> $nsg2 = Get-AzNetworkSecurityGroup -ResourceGroupName 'rg2' -Name 'nsg2'
-    PS C:\> Copy-AzNSGRules -SourceNSG $nsg1 -TargetNSG $nsg2
+    PS C:\> Copy-AzNSGSecurityRules -SourceNSG $nsg1 -TargetNSG $nsg2
 
     To copy security rules from the existing source NSG to existing target NSG (When direct NSG objects are provided)
 
@@ -84,9 +84,9 @@ Function Copy-AzNSGRules
 
     .EXAMPLE
 
-     . .\Copy-AzNSGRules.ps1
+     . .\Copy-AzNSGSecurityRules.ps1
     PS C:\> $nsg1 = Get-AzNetworkSecurityGroup -ResourceGroupName 'rg1' -Name 'nsg1'
-    PS C:\> Copy-AzNSGRules -SourceNSG $nsg1 -TargetNSGName 'nsg2' -TargetResourceGroupName 'rg2' -TargetLocation 'southindia'
+    PS C:\> Copy-AzNSGSecurityRules -SourceNSG $nsg1 -TargetNSGName 'nsg2' -TargetResourceGroupName 'rg2' -TargetLocation 'southindia'
 
     To create a new NSG and then copy security rules from the existing source NSG (When direct source NSG object is provided)
 
@@ -111,7 +111,7 @@ Function Copy-AzNSGRules
 
     Copy-AzNSGRules -SourceNSG <psobject> -TargetResourceGroupName <string> -TargetNSGName <string> -TargetLocation <string> [<CommonParameters>]
 
-    Copy-AzNSGRules -SourceNSG <psobject> -TargetNSG <psobject> [<CommonParameters>]
+    Copy-AzNSGRules -SourceNSG <psobject> -TargetNSG <psobject> [-Overwrite] [<CommonParameters>]
 
     #>
 
@@ -153,8 +153,10 @@ Function Copy-AzNSGRules
         # Target location, NSG to be created 
         [Parameter(Mandatory = $true, ParameterSetName = 'CreateNew')]
         [Parameter(Mandatory = $true, ParameterSetName = 'NewNSG')]
-        [string] $TargetLocation
+        [string] $TargetLocation,
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'NSG')]
+        [switch] $Overwrite
     )
 
     # Check for source NSG, value by name
@@ -177,7 +179,15 @@ Function Copy-AzNSGRules
     # Check for source NSG, value by NSG object
     if ($PSCmdlet.ParameterSetName -eq 'NSG' -or $PSCmdlet.ParameterSetName -eq 'NewNSG')
     {
-        Write-Host ("Info: Source NSG '{0}' has {1} following security rules...`n{2}" -f $SourceNSG.Name, $SourceNSG.SecurityRules.Count, ($SourceNSG.SecurityRules.Name -join ', ') ) -ForegroundColor Green
+        if ($SourceNSG -is [Microsoft.Azure.Commands.Network.Models.PSNetworkSecurityGroup])
+        {
+            Write-Host ("Info: Source NSG '{0}' has {1} following security rules...`n{2}" -f $SourceNSG.Name, $SourceNSG.SecurityRules.Count, ($SourceNSG.SecurityRules.Name -join ', ') ) -ForegroundColor Green
+        }
+        else
+        {
+            Write-Host "Error: Please enter a valid Source Network Security Group" -ForegroundColor Red
+            return
+        }
     }
 
     if ($SourceNSG.SecurityRules.Count -le 0)
@@ -235,19 +245,64 @@ Function Copy-AzNSGRules
     # For all scenarios incluing when NSG objects are provided
     try
     {
-        Write-Host ("Info: Copying security rules from the source nsg '{0}' to target nsg '{1}'..." -f $SourceNSG.Name, $TargetNSG.Name) -ForegroundColor Green
         # Add source NSG security rules to target NSG
-        $TargetNSG.SecurityRules = $SourceNSG.SecurityRules
+        if ($TargetNSG -is [Microsoft.Azure.Commands.Network.Models.PSNetworkSecurityGroup])
+        {
+            $RulesCopied = @()
+            Write-Host ("Info: Copying security rules from the source nsg '{0}' to target nsg '{1}'..." -f $SourceNSG.Name, $TargetNSG.Name) -ForegroundColor Green
+            if ($PSCmdlet.ParameterSetName -ne 'NSG' -or ($PSCmdlet.ParameterSetName -eq 'NSG' -and $Overwrite))
+            {
+                # Overwrites all the existing rules when `-Overwrite` falg is used with NSG parameterset or for any other parametersets
+                $TargetNSG.SecurityRules = $SourceNSG.SecurityRules
+                $RulesCopied = $TargetNSG.SecurityRules.Name
+            }
+            else
+            {
+                # Get the maxmum priority number or assign new
+                if ($TargetNSG.SecurityRules.Count -gt 0)
+                {
+                    $RulePriority = ($TargetNSG.SecurityRules.Priority | Measure-Object -Maximum | ForEach-Object Maximum)
+                }
+                else 
+                {
+                    $RulePriority = 990
+                }
 
-        # Update target NSG
-        $null = Set-AzNetworkSecurityGroup -NetworkSecurityGroup $TargetNSG -ErrorAction Stop  # $null used to supress the output
-
-        # Success information
-        Write-Host ("Info: Following {0} security rule(s) is/are copied from source NSG '{1}\{2}' to target NSG '{3}\{4}'" -f $SourceNSG.SecurityRules.Count, $SourceNSG.ResourceGroupName, $SourceNSG.Name, $TargetNSG.ResourceGroupName, $TargetNSG.Name) -ForegroundColor Green
-        Write-Host ($SourceNSG.SecurityRules.Name -join ', ') -ForegroundColor Green
+                # Compare each rule and if that doens't exist then add it to target nsg
+                foreach ($Rule in $SourceNSG.SecurityRules)
+                {
+                    $IsRuleExist = $TargetNSG.SecurityRules | Where-Object { $_.DestinationPortRange -eq $Rule.DestinationPortRange -and $_.Access -eq $Rule.Access -and $_.Direction -eq $Rule.Direction } 
+                    if (-not $IsRuleExist)
+                    {
+                        $Rule.Priority = $RulePriority + 10
+                        $TargetNSG.SecurityRules += $Rule
+                        $RulesCopied += $Rule.Name
+                    }
+                    else 
+                    {
+                        Write-Host ( "Warning: Skipping {0} rule, since it is already exists in the target NetworkSecurityGroup." -f $Rule.Name) -ForegroundColor DarkYellow
+                    }
+                }
+            }
+            # Update target NSG
+            $null = Set-AzNetworkSecurityGroup -NetworkSecurityGroup $TargetNSG -ErrorAction Stop  # $null used to supress the output
+            
+            # Success information
+            if ($RulesCopied.Count -gt 0)
+            {
+                Write-Host ("Info: Following {0} security rule(s) is/are copied from source NSG '{1}\{2}' to target NSG '{3}\{4}'" -f $RulesCopied.Count, $SourceNSG.ResourceGroupName, $SourceNSG.Name, $TargetNSG.ResourceGroupName, $TargetNSG.Name) -ForegroundColor Green
+                Write-Host ($RulesCopied -join ', ') -ForegroundColor Green
+            }
+        }
+        else 
+        {
+            Write-Host "Error: Please enter a valid Target Network Security Group" -ForegroundColor Red
+            return
+        }
     }
     catch
     {
+        # Throw error on the host
         Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red 
     }
 }
