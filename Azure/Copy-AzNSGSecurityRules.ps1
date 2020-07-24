@@ -105,13 +105,13 @@ Function Copy-AzNSGSecurityRules
 
     This function will accept the following Parameter Sets...
     
-    Copy-AzNSGRules -SourceResourceGroupName <string> -SourceNSGName <string> -TargetResourceGroupName <string> -TargetNSGName <string> [<CommonParameters>]
+    Copy-AzNSGSecurityRules -SourceResourceGroupName <string> -SourceNSGName <string> -TargetResourceGroupName <string> -TargetNSGName <string> [<CommonParameters>]
 
-    Copy-AzNSGRules -SourceResourceGroupName <string> -SourceNSGName <string> -TargetResourceGroupName <string> -TargetNSGName <string> -TargetLocation <string> [<CommonParameters>]
+    Copy-AzNSGSecurityRules -SourceResourceGroupName <string> -SourceNSGName <string> -TargetResourceGroupName <string> -TargetNSGName <string> -TargetLocation <string> [<CommonParameters>]
 
-    Copy-AzNSGRules -SourceNSG <psobject> -TargetResourceGroupName <string> -TargetNSGName <string> -TargetLocation <string> [<CommonParameters>]
+    Copy-AzNSGSecurityRules -SourceNSG <psobject> -TargetResourceGroupName <string> -TargetNSGName <string> -TargetLocation <string> [<CommonParameters>]
 
-    Copy-AzNSGRules -SourceNSG <psobject> -TargetNSG <psobject> [-Overwrite] [<CommonParameters>]
+    Copy-AzNSGSecurityRules -SourceNSG <psobject> -TargetNSG <psobject> [-Overwrite] [<CommonParameters>]
 
     #>
 
